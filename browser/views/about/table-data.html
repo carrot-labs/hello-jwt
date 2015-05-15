@@ -1,0 +1,21 @@
+<h3>
+  {{selected.name}} - {{selected.price}} <br>
+  <span style="color: red;" ng-click="unselect()">x</span>
+</h3>
+
+<table class="table" border=1>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Price</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr ng-repeat="scotch in scotches" ng-click="select(scotch)">
+      <td>{{scotch.name}}</td>
+      <td>{{scotch.price | currency}}</td>
+    </tr>
+  </tbody>
+
+</table>

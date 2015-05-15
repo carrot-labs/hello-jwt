@@ -1,0 +1,19 @@
+<h2>Login</h2>
+
+<form name="loginForm">
+  <md-input-container flex>
+    <label>Username</label>
+    <input ng-model="credentials.username">
+  </md-input-container>
+
+  <md-input-container flex>
+    <label>Password</label>
+    <input type="password" ng-model="credentials.password">
+  </md-input-container>
+
+  <md-button class="md-raised md-primary" ng-click="submit(credentials)">Submit</md-button>
+</form>
+
+<pre>
+  {{credentials}}
+</pre>

@@ -1,0 +1,8 @@
+<core-menu selected="0">
+  <paper-item ng-repeat="dog in dogs" ng-click="alert('Selected Dog:' + $index)">
+    <core-icon icon="label-outline"></core-icon>
+    {{dog}}
+  </paper-item>
+</core-menu>
+
+{{selected}}
