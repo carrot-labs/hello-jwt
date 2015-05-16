@@ -44,10 +44,55 @@ if(env === 'development') {
 }
 
 /**
+ * JWT config
+ */
+var secret = 'topsecret';
+
+app.post('/auth', function(req, res) {
+  if(!(req.body.username === 'gui' && req.body.password === '123')) {
+    res.status(401).send('Wrong user or password');
+    return;
+  }
+
+  var profile = {
+    firstName: 'Guilherme',
+    lastName: 'Coelho',
+    email: 'guilhermervcoelho@gmail.com',
+    id: 123
+  };
+
+  var token = jwt.sign(profile, secret, { expiresInMinutes: 60*5 });
+
+  res.json({ token: token });
+});
+
+/**
  * Routes config
  */
 
-app.get(/^.*$/, function(req, res) {
+app.get('/api/users', function(req, res) {
+  var users = [{
+    name: 'Sam',
+    age: 20,
+    salary: 4000
+  }, {
+    name: 'Gui',
+    age: 19,
+    salary: 3000
+  }, {
+    name: 'Murilex',
+    age: 20,
+    salary: 789
+  }, {
+    name: 'Lidi',
+    age: 29,
+    salary: 3000
+  }];
+
+  res.json(users);
+});
+
+app.get('*', function(req, res) {
   res.sendFile(path.join(publicFolder, 'index.html'));
 });
 

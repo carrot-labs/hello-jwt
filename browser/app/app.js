@@ -10,7 +10,13 @@ var app = angular.module('app', [
  * Application config
  */
 
-app.config(function($stateProvider, $urlRouterProvider, $mdIconProvider) {
+app.config(function($stateProvider, $urlRouterProvider, $httpProvider, $mdIconProvider) {
+
+  /**
+   * JWT - Http Interceptor
+   */
+  $httpProvider.interceptors.push('authInterceptor');
+  // $httpProvider.inteceptors.push('authInterceptor');
 
   /**
    * Provides the icons
@@ -80,17 +86,49 @@ app.config(function($stateProvider, $urlRouterProvider, $mdIconProvider) {
     }
   });
 
+  /**
+   * Users route
+   */
+  $stateProvider.state('users', {
+    url: '/users',
+    templateUrl: 'views/users/index.html',
+    controller: 'usersController'
+  })
+
 });
 
-app.controller('loginController', function($scope, $http, $log) {
-  $scope.credentials = {};
+app.controller('loginController', function($scope, $http, $window, $log, AuthService) {
+  $scope.credentials = {
+    username: 'gui',
+    password: 123
+  };
 
   $scope.submit = submit;
+  $scope.verify = verify;
 
   function submit(credentials) {
-    $log.info(credentials);
+    var url = '/auth';
+    var data = $scope.credentials;
+
+    $http.post(url, data)
+      .success(function(data, status) {
+        $window.sessionStorage.token = data.token;
+        AuthService.isLoggedIn = true;
+      });
   }
 
+  function verify() {
+    $log.info(AuthService.isLoggedIn);
+  }
+});
+
+app.controller('usersController', function($scope, $http) {
+  $scope.users = [];
+
+  $http.get('/api/users')
+    .success(function(data) {
+      $scope.users = data;
+    });
 });
 
 app.controller('scotchController', function($scope) {
@@ -114,4 +152,41 @@ app.controller('scotchController', function($scope) {
   $scope.unselect = function() {
     $scope.selected = {};
   };
+});
+
+/**
+ * Auth Service
+ */
+
+app.service('AuthService', function() {
+  this.isLoggedIn = false;
+});
+
+
+/**
+ * Auth Inteceptor
+ */
+app.factory('authInterceptor', function($rootScope, $q, $window) {
+  return {
+    request: request,
+    responseError: responseError
+  };
+
+  function request(config) {
+    config.headers = config.headers || {};
+
+    if($window.sessionStorage.token) {
+      config.headers.Authorization = 'Bearer ' + $window.sessionStorage.token;
+    }
+
+    return config;
+  }
+
+  function responseError(rejection) {
+    if(rejection.status === 401) {
+      $state.go('login');
+    }
+
+    return $q.reject(rejection);
+  }
 });
